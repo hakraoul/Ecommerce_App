@@ -25,9 +25,9 @@ const userSchema = mongoose.Schema({
     type: String,
     validate: {
       validator: (value) => {
-        return value.length >6;
+        return value.length > 6;
       },
-      message: "Password must be 6 characters."
+      message: "Password must be 6 characters.",
     },
   },
   address: {
@@ -42,9 +42,9 @@ const userSchema = mongoose.Schema({
 
 //Middleware
 //This will execute before the document is saved
-userSchema.pre('save', async function (next) {
+userSchema.pre("save", async function (next) {
   //Only execute when the password field is modified.
-  if (!this.isModified('password')) return next();
+  if (!this.isModified("password")) return next();
 
   //Hash the password with the cost of 12
   this.password = await bcrypt.hash(this.password, 12);
@@ -54,6 +54,14 @@ userSchema.pre('save', async function (next) {
 
   next();
 });
+
+//Instance method
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const User = mongoose.model("User", userSchema);
 

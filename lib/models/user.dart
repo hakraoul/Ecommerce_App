@@ -34,18 +34,27 @@ class User {
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      id: map['_id'] as String,
-      email: map['email'] as String,
-      name: map['name'] as String,
-      password: map['password'] as String,
-      address: map['address'] as String,
-      type: map['type'] as String,
-      token: map['token'] as String,
+      id: map['_id'] ?? '', // '??' provide default value
+      email: map['email'] ?? '',
+      name: map['name'] ?? '',
+      password: map['password'] ?? '',
+      address: map['address'] ?? '',
+      type: map['type'] ?? '',
+      token: map['token'] ?? '',
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory User.fromJson(String source) =>
-      User.fromMap(json.decode(source) as Map<String, dynamic>);
+  // factory User.fromJson(String source) =>
+  //     User.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  factory User.fromJson(String source) {
+  try {
+    return User.fromMap(json.decode(source) as Map<String, dynamic>);
+  } catch (e) {
+    print("Error decoding JSON: $e");
+    return User(id: '', email: '', name: '', password: '', address: '', type: '', token: '');
+  }
+}
 }

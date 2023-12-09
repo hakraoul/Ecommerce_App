@@ -1,7 +1,22 @@
 const express = require("express");
 const User = require("../models/user");
-
+const jwt = require("jsonwebtoken");
 const authRouter = express.Router();
+
+const signToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  res.status(statusCode).json({
+    status: "success",
+    token : token,
+    ...user._doc,
+  });
+}
 
 authRouter.route("/signup").post(async (req, res) => {
   try {
@@ -26,17 +41,27 @@ authRouter.route("/signup").post(async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "failed",
-      err,
+      error: error.message,
     });
   }
 });
 
-authRouter.route("/users").get(async (req, res) => {
-  const users = await User.find();
-  res.status(200).json({
-    status: "success",
-    users,
-  });
+authRouter.route("/signin").post(async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email }).select("+password");
+    if (!user || !(await user.correctPassword(password, user.password))) {
+      return res.status(400).json({
+        message: "Invalid Email or Password.",
+      });
+    }
+    createSendToken(user, 200, res);
+  } catch (error) {
+    res.status(400).json({
+      status: "failed",
+      error: error.message,
+    });
+  }
 });
 
 module.exports = authRouter;

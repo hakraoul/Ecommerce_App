@@ -32,10 +32,18 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void userSignUp() {
-    authService.SignUpUser(
+    authService.signUpUser(
       context: context,
       email: _emailController.text,
       name: _nameController.text,
+      password: _passwordController.text,
+    );
+  }
+
+  void userSignIn() {
+    authService.signInUser(
+      context: context,
+      email: _emailController.text,
       password: _passwordController.text,
     );
   }
@@ -110,7 +118,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         CustomButton(
                           text: "Sign Up",
                           onTap: () {
-                            if (_signinFormKey.currentState!.validate()) {
+                            if (_signupFormKey.currentState!.validate()) {
                               userSignUp();
                             }
                           },
@@ -163,8 +171,12 @@ class _AuthScreenState extends State<AuthScreen> {
                           height: 10,
                         ),
                         CustomButton(
-                          text: "Sign Up",
-                          onTap: () {},
+                          text: "Sign In",
+                          onTap: () {
+                            if (_signinFormKey.currentState!.validate()) {
+                              userSignIn();
+                            }
+                          },
                         )
                       ],
                     ),
