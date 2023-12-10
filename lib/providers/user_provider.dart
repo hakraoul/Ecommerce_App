@@ -17,9 +17,7 @@ class UserProvider extends ChangeNotifier {
 
   //update user
   void setUser(String user) {
-    print("User: ${user}");
     _user = User.fromJson(user);
-    print("User provider: ${_user.toJson()}");
     notifyListeners(); //notify the listener that user has been change and it will rebuld.
   }
 }

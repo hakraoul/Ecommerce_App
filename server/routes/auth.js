@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const authRouter = express.Router();
+const protected = require("../middleware/protected");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -13,10 +14,10 @@ const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
   res.status(statusCode).json({
     status: "success",
-    token : token,
+    token: token,
     ...user._doc,
   });
-}
+};
 
 authRouter.route("/signup").post(async (req, res) => {
   try {
@@ -62,6 +63,32 @@ authRouter.route("/signin").post(async (req, res) => {
       error: error.message,
     });
   }
+});
+
+authRouter.route("/tokenIsValid").post(async (req, res) => {
+  try {
+    const token = req.header("x-auth-token");
+    if (!token) return res.json(false);
+
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    if (!verified) return res.json(false);
+
+    const user = User.findById(verified.id);
+    if (!user) return res.json(false);
+
+    res.json(true);
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      error: error.message,
+    });
+  }
+});
+
+//get user data
+authRouter.route("/").get(protected, async (req, res) => {
+  const user = await User.findById(req.user);
+  res.json({ ...user._doc, token: req.token });
 });
 
 module.exports = authRouter;

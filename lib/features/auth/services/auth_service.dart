@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ecommerce_app/common/widgets/bottom_bar.dart';
 import 'package:ecommerce_app/constants/error_handling.dart';
 import 'package:ecommerce_app/constants/utils.dart';
 import 'package:ecommerce_app/features/home/home_screen.dart';
@@ -31,7 +32,7 @@ class AuthService {
 
       //route
       http.Response res = await http.post(
-        Uri.parse('$uri/api/signup'),
+        Uri.parse('$uri/signup'),
         body: user.toJson(),
         headers: <String, String>{
           "Content-Type": 'application/json; charset=UTF-8',
@@ -64,7 +65,7 @@ class AuthService {
     try {
       //route
       http.Response res = await http.post(
-        Uri.parse('$uri/api/signin'),
+        Uri.parse('$uri/signin'),
         body: jsonEncode(
           {
             "email": email,
@@ -87,7 +88,7 @@ class AuthService {
             );
             Navigator.pushNamedAndRemoveUntil(
               context,
-              HomeScreen.routeName,
+              BottomBar.routeName,
               (route) => false,
             );
           });
@@ -97,5 +98,38 @@ class AuthService {
         err.toString(),
       );
     }
+  }
+
+  void getUserData(
+    BuildContext context,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("x-auth-token");
+      if (token == null) {
+        prefs.setString("x-auth-token", "");
+      }
+
+      var tokenRes = await http.post(
+        Uri.parse("$uri/tokenIsValid"),
+        headers: <String, String>{
+          "Content-Type": 'application/json; charset=UTF-8',
+          "x-auth-token": token!,
+        },
+      );
+
+      var response = jsonDecode(tokenRes.body);
+
+      if(response == true){
+       http.Response userRes = await http.get(Uri.parse('$uri/'), headers: <String, String>{
+        "Content-Type": 'application/json; charset=UTF-8',
+          "x-auth-token": token,
+       });
+
+       var userProvider = Provider.of<UserProvider>(context, listen: false);
+       userProvider.setUser(userRes.body);
+      }
+
+    } catch (err) {}
   }
 }
