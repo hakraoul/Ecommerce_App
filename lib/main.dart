@@ -1,8 +1,9 @@
 import 'package:ecommerce_app/common/widgets/bottom_bar.dart';
 import 'package:ecommerce_app/constants/global_variables.dart';
+import 'package:ecommerce_app/features/admin/screens/admin_screen.dart';
 import 'package:ecommerce_app/features/auth/screens/auth_screen.dart';
 import 'package:ecommerce_app/features/auth/services/auth_service.dart';
-import 'package:ecommerce_app/features/home/home_screen.dart';
+import 'package:ecommerce_app/features/home/screens/home_screen.dart';
 import 'package:ecommerce_app/providers/user_provider.dart';
 import 'package:ecommerce_app/router.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,9 @@ class _MyAppState extends State<MyApp> {
       //Everytime we use route it will execute this callback
       onGenerateRoute: (settings) => generateRoute(settings),
       home: Provider.of<UserProvider>(context).user.token.isNotEmpty
-          ? const BottomBar()
+          ? Provider.of<UserProvider>(context).user.type == "user"
+              ? const BottomBar()
+              : const AdminScreen()
           : const AuthScreen(),
     );
   }

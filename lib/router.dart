@@ -1,6 +1,7 @@
 import 'package:ecommerce_app/common/widgets/bottom_bar.dart';
+import 'package:ecommerce_app/features/admin/screens/add_product_screen.dart';
 import 'package:ecommerce_app/features/auth/screens/auth_screen.dart';
-import 'package:ecommerce_app/features/home/home_screen.dart';
+import 'package:ecommerce_app/features/home/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 Route<dynamic> generateRoute(RouteSettings routerSettings) {
@@ -20,7 +21,11 @@ Route<dynamic> generateRoute(RouteSettings routerSettings) {
         settings: routerSettings,
         builder: (_) => const HomeScreen(),
       );
-
+    case AddProductScreen.routeName:
+      return MaterialPageRoute(
+        settings: routerSettings,
+        builder: (_) => const AddProductScreen(),
+      );
     default:
       return MaterialPageRoute(
         builder: (_) => const Scaffold(
